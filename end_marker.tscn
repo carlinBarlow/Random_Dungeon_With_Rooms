@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://iwdhs4v6wus4"]
+
+[node name="EndMarker" type="Node2D"]
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -1.0
+offset_top = -1.0
+offset_right = 1.0
+offset_bottom = 1.0
+color = Color(0.963195, 0, 0.199955, 1)

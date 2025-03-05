@@ -1,7 +1,7 @@
 extends Node2D
 
 var dungeon = {}
-var rooms = {
+const ROOMS = {
 	"B": preload("res://Assets/B.png"),
 	"BL": preload("res://Assets/BL.png"),
 	"BLR": preload("res://Assets/BLR.png"),
@@ -32,12 +32,25 @@ func load_map():
 	for i in dungeon.keys():
 		var room_name = check_connection_directions(dungeon.get(i).connected_rooms)
 		var temp = Sprite2D.new()
-		for x in rooms.keys():
+		for x in ROOMS.keys():
 			if room_name == x:
-				temp.texture = rooms.get(x)
+				temp.texture = ROOMS.get(x)
 		map_node.add_child(temp)
 		temp.z_index = 1
 		temp.position = i * 10
+		
+		if dungeon.get(i).starting_room:
+			const START_MARKER = preload("res://start_marker.tscn")
+			var new_start_marker = START_MARKER.instantiate()
+			new_start_marker.z_index = 1
+			new_start_marker.global_position = temp.position
+			map_node.add_child(new_start_marker)
+		elif dungeon.get(i).ending_room:
+			const END_MARKER = preload("res://end_marker.tscn")
+			var new_end_marker = END_MARKER.instantiate()
+			new_end_marker.z_index = 1
+			new_end_marker.global_position = temp.position
+			map_node.add_child(new_end_marker)
 
 func check_connection_directions(connected_rooms):
 	var room_name = ""

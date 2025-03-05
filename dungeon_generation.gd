@@ -1,6 +1,6 @@
 extends Node
 
-var ROOM = preload("res://room.tscn")
+const ROOM = preload("res://room.tscn")
 
 var min_number_of_rooms = 10
 var max_number_of_rooms = 20
@@ -12,6 +12,7 @@ func generate(room_seed):
 	var dungeon = {}
 	var size = randi_range(min_number_of_rooms, max_number_of_rooms)
 	dungeon[Vector2(0, 0)] = ROOM.instantiate()
+	dungeon[Vector2(0, 0)].starting_room = true
 	size -= 1
 	
 	while size > 0:
@@ -51,6 +52,13 @@ func generate(room_seed):
 					if dungeon.get(i).connected_rooms.get(Vector2(0, -1)) == null:
 						connect_rooms(dungeon.get(i), dungeon.get(new_room_position), Vector2(0, -1))
 	
+	var end_room_candidates = []
+	for i in dungeon.keys():
+		if dungeon.get(i).number_of_connections == 1 and !dungeon.get(i).starting_room:
+			end_room_candidates.append(i)
+	
+	dungeon[end_room_candidates[randi_range(0, end_room_candidates.size() - 1)]].ending_room = true
+	
 	while !is_interesting(dungeon):
 		for i in dungeon.keys():
 			dungeon.get(i).queue_free()
@@ -69,4 +77,11 @@ func is_interesting(dungeon):
 	for i in dungeon.keys():
 		if dungeon.get(i).number_of_connections >= 3:
 			rooms_with_three_connections += 1
-	return rooms_with_three_connections >= 2
+	
+	var next_to_start = false
+	for i in dungeon.get(Vector2(0, 0)).connected_rooms.keys():
+		if dungeon.get(Vector2(0, 0)).connected_rooms.get(i) != null:
+			if dungeon.get(Vector2(0, 0)).connected_rooms.get(i).ending_room:
+				next_to_start = true
+	
+	return (rooms_with_three_connections >= 2) != next_to_start
